@@ -57,10 +57,16 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define USART_TX_Pin GPIO_PIN_9
+#define USART_TX_GPIO_Port GPIOA
+#define USART_RX_Pin GPIO_PIN_10
+#define USART_RX_GPIO_Port GPIOA
 #define CAN_RX_Pin GPIO_PIN_11
 #define CAN_RX_GPIO_Port GPIOA
 #define CAN_TX_Pin GPIO_PIN_12
 #define CAN_TX_GPIO_Port GPIOA
+#define TIM4_PWM_Pin GPIO_PIN_9
+#define TIM4_PWM_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
