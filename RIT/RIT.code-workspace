@@ -23,7 +23,11 @@
             "*.cpp": "cpp",
             "*.cxx": "cpp",
             "*.cc": "cpp",
-            "cstdint": "c"
+            "cstdint": "c",
+            "iterator": "c",
+            "xutility": "c",
+            "algorithm": "c",
+            "format": "c"
         },
         "[yaml]": {
             "editor.insertSpaces": true,
