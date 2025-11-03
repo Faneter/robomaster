@@ -26,6 +26,7 @@
 #include "tim.h"
 #include "wheel.h"
 #include "servo.h"
+#include "ax_ps2.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -186,14 +187,27 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
     /* USER CODE BEGIN SysTick_IRQn 0 */
-    static uint8_t count_wheel = 0;
+    static uint8_t count       = 0;
     static uint16_t count_uart = 0;
     // 系统定时器中断处理代码，此定时器每1ms产生一次中断
     timestamp++;
-    if (++count_wheel == 10) {
+    if (++count == 4) {
         UpdateWheelRPM(timestamp);
-        UpdateServoAngle();
-        count_wheel = 0;
+
+        // 手柄按键事件处理
+        uint16_t control = AX_PS2_ScanKey();
+        uint8_t key      = control >> 8;
+        uint8_t state    = control & 0x00FF;
+
+        if (key == BUTTON_START && state == BUTTON_STATE_RELEASED) {
+            JoyStickControl = !JoyStickControl;
+        }
+
+        if (JoyStickControl) {
+            KeyEventHandler(key, state);
+        }
+
+        count = 0;
     }
     if (++count_uart == 1000) {
         count_uart = 0;

@@ -29,10 +29,10 @@
   *   03     0x5A   Bit0  Bit1  Bit2  Bit3  Bit4  Bit5  Bit6  Bit7
   *   04     data   SLCT  JOYR  JOYL  STRT   UP   RGIHT  DOWN   L
   *   05     data   L2     R2     L1    R1   Y     B     A      X
-  *   06     data   右边摇杆  0x00 = 左    0xff = 右
-  *   07     data   右边摇杆  0x00 = 上    0xff = 下
-  *   08     data   左边摇杆  0x00 = 左    0xff = 右
-  *   09     data   左边摇杆  0x00 = 上    0xff = 下
+  *   06     data   右边摇杆  0x00 = 左    0xff = 右    0x80 = 中间
+  *   07     data   右边摇杆  0x00 = 上    0xff = 下    0x7f = 中间
+  *   08     data   左边摇杆  0x00 = 左    0xff = 右    0x80 = 中间
+  *   09     data   左边摇杆  0x00 = 上    0xff = 下    0x7f = 中间
   *
   ******************************************************************************
   */
@@ -85,10 +85,12 @@ typedef struct
 #define BUTTON_STATE_PRESSED  0x01
 
 extern JOYSTICK_TypeDef JoyStick;
+extern uint8_t JoyStickControl;
 
 /*** PS2无线手柄操作函数 **********/
 void AX_PS2_Init(void);    // PS2初始化
 uint16_t AX_PS2_ScanKey(); // PS2获取按键及摇杆数值
+void KeyEventHandler(uint8_t key, uint8_t state);
 
 #endif
 

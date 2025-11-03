@@ -191,7 +191,7 @@ void CarMove(float Vx, float Vy, float Vz)
     } else {
         SetWheelDirection(3, STOP);
     }
-    SetWheelTargetRPM(3, fabsf(Va) / RADIUS);
+    SetWheelTargetRPM(3, fabsf(Va) / (RADIUS * 2 * M_PI) * 60);
 
     if (Vb < 0) {
         SetWheelDirection(1, CLOCKWISE);
@@ -200,7 +200,7 @@ void CarMove(float Vx, float Vy, float Vz)
     } else {
         SetWheelDirection(1, STOP);
     }
-    SetWheelTargetRPM(1, fabsf(Vb) / RADIUS);
+    SetWheelTargetRPM(1, fabsf(Vb) / (RADIUS * 2 * M_PI) * 60);
 
     if (Vc < 0) {
         SetWheelDirection(2, CLOCKWISE);
@@ -209,7 +209,7 @@ void CarMove(float Vx, float Vy, float Vz)
     } else {
         SetWheelDirection(2, STOP);
     }
-    SetWheelTargetRPM(2, fabsf(Vc) / RADIUS);
+    SetWheelTargetRPM(2, fabsf(Vc) / (RADIUS * 2 * M_PI) * 60);
 
     if (Vd < 0) {
         SetWheelDirection(4, CLOCKWISE);
@@ -218,5 +218,5 @@ void CarMove(float Vx, float Vy, float Vz)
     } else {
         SetWheelDirection(4, STOP);
     }
-    SetWheelTargetRPM(4, fabsf(Vd) / RADIUS);
+    SetWheelTargetRPM(4, fabsf(Vd) / (RADIUS * 2 * M_PI) * 60);
 }

@@ -80,7 +80,8 @@ int main(void)
     HAL_Init();
 
     /* USER CODE BEGIN Init */
-
+    // 手柄配置
+    AX_PS2_Init();
     /* USER CODE END Init */
 
     /* Configure the system clock */
@@ -105,8 +106,7 @@ int main(void)
     Wheel_Init();
     // 舵机配置
     Servo_Init();
-    // 手柄配置
-    AX_PS2_Init();
+
     // 串口接受数据开始
     HAL_UARTEx_ReceiveToIdle_DMA(&huart3, UART_RxBuff, UART_RX_BUFF_LENGTH);
     /* USER CODE END 2 */
@@ -184,6 +184,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         switch (UART_RxBuff[0]) {
             case SERVO_CONTROL:
                 ServoControlDataInit(&servo_data, UART_RxBuff);
+                UpdateServoAngle();
                 break;
             default:
                 break;

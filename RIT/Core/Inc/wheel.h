@@ -5,6 +5,8 @@
 #include "tim.h"
 #include "main.h"
 
+#define M_PI		3.14159265358979323846
+
 // 左前轮
 #define WHEEL_LF_PWM         Wheel_1_PWM_Pin
 #define WHEEL_LF_PWM_TIM     &htim2
@@ -48,9 +50,9 @@
 #define PLUSE            3
 
 // 物理参数
-#define W      10
-#define H      10
-#define RADIUS 5
+#define W      10.0f
+#define H      10.0f
+#define RADIUS 5.0f
 
 extern uint64_t WHEEL_PULSE[4];
 
