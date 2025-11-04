@@ -190,6 +190,7 @@ void SysTick_Handler(void)
     static uint8_t count       = 0;
     static uint16_t count_uart = 0;
     // 系统定时器中断处理代码，此定时器每1ms产生一次中断
+
     timestamp++;
     if (++count == 4) {
         UpdateWheelRPM(timestamp);
@@ -197,20 +198,24 @@ void SysTick_Handler(void)
         // 手柄按键事件处理
         uint16_t control = AX_PS2_ScanKey();
         uint8_t key      = control >> 8;
-        uint8_t state    = control & 0x00FF;
+        uint8_t state    = (uint8_t)(control & 0x00FF);
 
         if (key == BUTTON_START && state == BUTTON_STATE_RELEASED) {
             JoyStickControl = !JoyStickControl;
         }
 
+        KeyEventHandler(key, state);
         if (JoyStickControl) {
-            KeyEventHandler(key, state);
+            // KeyEventHandler(key, state);
+            count_uart = 0;
         }
+
+        // uint8_t test[2] = {JoyStick.LJoy_LR, JoyStick.LJoy_UD};
+        // HAL_UART_Transmit_DMA(&huart3, test, 2);
 
         count = 0;
     }
     if (++count_uart == 1000) {
-        count_uart = 0;
     }
     /* USER CODE END SysTick_IRQn 0 */
     HAL_IncTick();

@@ -38,6 +38,7 @@
   */
 
 #include "ax_ps2.h"
+#include "usart.h"
 
 // PS2手柄的输入输出口
 #define DI()    HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) // 数据输入引脚
@@ -58,11 +59,11 @@ uint8_t JoyStickControl = 0;
 
 static const uint8_t BUTTON_MAP[2][8] = {
     // btn1 (PS2_data[3]) 的按键映射
-    {BUTTON_SELECT, BUTTON_RS, BUTTON_START, BUTTON_UP,
-     BUTTON_RIGHT, BUTTON_DOWN, BUTTON_LEFT, BUTTON_L2},
+    {BUTTON_LEFT, BUTTON_DOWN, BUTTON_RIGHT, BUTTON_UP,
+     BUTTON_START, BUTTON_RS, BUTTON_LS, BUTTON_SELECT},
     // btn2 (PS2_data[4]) 的按键映射
-    {BUTTON_R2, BUTTON_L1, BUTTON_R1, BUTTON_Y,
-     BUTTON_B, BUTTON_A, BUTTON_X, BUTTON_NO_CHANGE}};
+    {BUTTON_X, BUTTON_A, BUTTON_B, BUTTON_Y,
+     BUTTON_R1, BUTTON_L1, BUTTON_R2, BUTTON_L2}};
 
 void DWT_Init(void)
 {
@@ -197,5 +198,8 @@ uint16_t AX_PS2_ScanKey()
 
 void KeyEventHandler(uint8_t key, uint8_t state)
 {
-    
+    if (key != BUTTON_NO_CHANGE) {
+        uint8_t test[3] = {key, state};
+        HAL_UART_Transmit(&huart3, test, 2, HAL_MAX_DELAY);
+    }
 }

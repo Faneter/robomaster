@@ -49,7 +49,7 @@ typedef struct
 {
     uint8_t mode; /* 手柄的工作模式 */
 
-    uint8_t btn1; /* B0:SLCT B1:JR  B0:JL B3:STRT B4:UP B5:R B6:DOWN  B7:L   */
+    uint8_t btn1; /* B0:SLCT B1:JL  B2:JR B3:STRT B4:UP B5:R B6:DOWN  B7:L   */
 
     uint8_t btn2; /* B0:L2   B1:R2  B2:L1 B3:R1   B4:Y  B5:B B6:A     B7:X */
 
@@ -65,8 +65,8 @@ typedef struct
 
 #define BUTTON_NO_CHANGE      0x00
 #define BUTTON_SELECT         0x01
-#define BUTTON_RS             0x02
-#define BUTTON_LS             0x03
+#define BUTTON_LS             0x02
+#define BUTTON_RS             0x03
 #define BUTTON_START          0x04
 #define BUTTON_UP             0x05
 #define BUTTON_RIGHT          0x06
