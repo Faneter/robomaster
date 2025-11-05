@@ -26,15 +26,19 @@ void SetServoAngle(uint8_t servo, uint8_t angle)
     }
     switch (servo) {
         case 1:
+            servo_data.servo1 = angle;
             __HAL_TIM_SET_COMPARE(SERVO_1_PWM_TIM, SERVO_1_PWM_CHANNEL, angle + 45);
             break;
         case 2:
+            servo_data.servo2 = angle;
             __HAL_TIM_SET_COMPARE(SERVO_2_PWM_TIM, SERVO_2_PWM_CHANNEL, angle + 45);
             break;
         case 3:
+            servo_data.servo3 = angle;
             __HAL_TIM_SET_COMPARE(SERVO_3_PWM_TIM, SERVO_3_PWM_CHANNEL, angle + 45);
             break;
         case 4:
+            servo_data.servo4 = angle;
             __HAL_TIM_SET_COMPARE(SERVO_4_PWM_TIM, SERVO_4_PWM_CHANNEL, angle + 45);
             break;
         default:

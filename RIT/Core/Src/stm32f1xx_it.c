@@ -204,18 +204,14 @@ void SysTick_Handler(void)
             JoyStickControl = !JoyStickControl;
         }
 
-        KeyEventHandler(key, state);
         if (JoyStickControl) {
-            // KeyEventHandler(key, state);
-            count_uart = 0;
+            KeyEventHandler(key, state);
         }
-
-        // uint8_t test[2] = {JoyStick.LJoy_LR, JoyStick.LJoy_UD};
-        // HAL_UART_Transmit_DMA(&huart3, test, 2);
 
         count = 0;
     }
     if (++count_uart == 1000) {
+        count_uart = 0;
     }
     /* USER CODE END SysTick_IRQn 0 */
     HAL_IncTick();

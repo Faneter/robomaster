@@ -39,6 +39,7 @@
 
 #include "ax_ps2.h"
 #include "usart.h"
+#include "servo.h"
 
 // PS2手柄的输入输出口
 #define DI()    HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) // 数据输入引脚
@@ -198,8 +199,21 @@ uint16_t AX_PS2_ScanKey()
 
 void KeyEventHandler(uint8_t key, uint8_t state)
 {
+    static uint8_t last_key   = 0;
+    static uint8_t last_state = 0;
     if (key != BUTTON_NO_CHANGE) {
-        uint8_t test[3] = {key, state};
-        HAL_UART_Transmit(&huart3, test, 2, HAL_MAX_DELAY);
+        last_key   = key;
+        last_state = state;
+    } else if (key == BUTTON_NO_CHANGE) {
+        if (last_key == BUTTON_A && last_state == BUTTON_STATE_PRESSED) {
+            servo_data.servo1 += 1;
+            UpdateServoAngle();
+        }
+        if (last_key == BUTTON_B && last_state == BUTTON_STATE_PRESSED) {
+            if (servo_data.servo1 != 0) {
+                servo_data.servo1 -= 1;
+            }
+            UpdateServoAngle();
+        }
     }
 }
