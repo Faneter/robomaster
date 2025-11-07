@@ -8,6 +8,7 @@ uint64_t WHEEL_PULSE[4]   = {0, 0, 0, 0};
 float wheel_target_rpm[4] = {0, 0, 0, 0};
 PID_PWM_TypeDef wheel_pid[4];
 float wheel_actual_rpm[4] = {0, 0, 0, 0};
+float max_speed           = 1.0f;
 
 void Wheel_Init(void)
 {
@@ -50,9 +51,13 @@ void SetWheelTargetRPM(uint8_t wheel, float rpm)
 void UpdateWheelRPM(uint64_t ts)
 {
     uint64_t ms = ts - wheel_timestamp;
+
+    WHEEL_PULSE[3] = __HAL_TIM_GET_COUNTER(&htim4);
+    TIM4->CNT      = 0;
+
     for (int i = 0; i < 4; i++) {
-        wheel_actual_rpm[i] = WHEEL_PULSE[i - 1] * 60 * 1000 / 1320 / ms;
-        WHEEL_PULSE[i - 1]  = 0;
+        wheel_actual_rpm[i] = WHEEL_PULSE[i] * 60 * 1000 / 1320 / ms;
+        WHEEL_PULSE[i]      = 0;
     }
     wheel_timestamp = ts;
 
@@ -60,7 +65,7 @@ void UpdateWheelRPM(uint64_t ts)
     __HAL_TIM_SET_COMPARE(WHEEL_LF_PWM_TIM, WHEEL_LF_PWM_CHANNEL, (uint16_t)(100 * pwm1));
     float pwm2 = PID_Calculate(&wheel_pid[1], wheel_target_rpm[1], wheel_actual_rpm[1]);
     __HAL_TIM_SET_COMPARE(WHEEL_RF_PWM_TIM, WHEEL_RF_PWM_CHANNEL, (uint16_t)(100 * pwm2));
-    float pwm3 = PID_Calculate(&wheel_pid[2], wheel_target_rpm[2], wheel_actual_rpm[2]);
+    float pwm3 = 100 * PID_Calculate(&wheel_pid[2], wheel_target_rpm[2], wheel_actual_rpm[2]);
     __HAL_TIM_SET_COMPARE(WHEEL_LB_PWM_TIM, WHEEL_LB_PWM_CHANNEL, (uint16_t)(100 * pwm3));
     float pwm4 = PID_Calculate(&wheel_pid[3], wheel_target_rpm[3], wheel_actual_rpm[3]);
     __HAL_TIM_SET_COMPARE(WHEEL_RB_PWM_TIM, WHEEL_RB_PWM_CHANNEL, (uint16_t)(100 * pwm4));
@@ -178,11 +183,10 @@ void SetWheelDirection(uint8_t wheel, uint8_t direction)
  */
 void CarMove(float Vx, float Vy, float Vz)
 {
-    float T  = Vz * (H / 2 + W / 2);
-    float Va = Vx + Vy - T;
-    float Vb = Vx - Vy - T;
-    float Vc = Vx + Vy + T;
-    float Vd = Vx - Vy + T;
+    float Va = Vx + Vy - Vz * T;
+    float Vb = Vx - Vy - Vz * T;
+    float Vc = Vx + Vy + Vz * T;
+    float Vd = Vx - Vy + Vz * T;
 
     if (Va < 0) {
         SetWheelDirection(3, CLOCKWISE);
@@ -191,7 +195,7 @@ void CarMove(float Vx, float Vy, float Vz)
     } else {
         SetWheelDirection(3, STOP);
     }
-    SetWheelTargetRPM(3, fabsf(Va) / (RADIUS * 2 * M_PI) * 60);
+    SetWheelTargetRPM(3, fabsf(Va) * 60 / (RADIUS * 2 * M_PI));
 
     if (Vb < 0) {
         SetWheelDirection(1, CLOCKWISE);

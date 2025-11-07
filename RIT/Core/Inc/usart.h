@@ -129,3 +129,4 @@ void CarStateDataInit(Car_State_Data *control, uint8_t *data);
 #endif
 
 #endif /* __USART_H__ */
+
