@@ -203,19 +203,6 @@ void KeyEventHandler(uint8_t key, uint8_t state)
     static uint8_t last_key   = 0;
     static uint8_t last_state = 0;
     if (key != BUTTON_NO_CHANGE) {
-        if (key == BUTTON_X && state == BUTTON_STATE_RELEASED) {
-            SetWheelTargetRPM(4, 150);
-            // __HAL_TIM_SET_COMPARE(WHEEL_RB_PWM_TIM, WHEEL_RB_PWM_CHANNEL, 5000);
-            SetWheelDirection(4, CLOCKWISE);
-        }
-        if (key == BUTTON_Y && state == BUTTON_STATE_RELEASED) {
-            SetWheelTargetRPM(4, 300);
-            // __HAL_TIM_SET_COMPARE(WHEEL_RB_PWM_TIM, WHEEL_RB_PWM_CHANNEL, 5000);
-            SetWheelDirection(4, COUNTERCLOCKWISE);
-        }
-        if (key == BUTTON_DOWN) {
-            SetWheelDirection(4, STOP);
-        }
         last_key   = key;
         last_state = state;
     } else if (key == BUTTON_NO_CHANGE) {

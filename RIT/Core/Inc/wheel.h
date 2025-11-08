@@ -59,12 +59,13 @@ extern uint64_t WHEEL_PULSE[4];
 extern float max_speed;
 extern float wheel_target_rpm[4];
 
-
 void SetWheelTargetRPM(uint8_t wheel, float rpm);
 float GetWheelActualRPM(uint8_t wheel);
 void UpdateWheelRPM(uint64_t ts);
 void SetWheelDirection(uint8_t wheel, uint8_t direction);
 void CarMove(float Vx, float Vy, float Vz);
+void CarSpin(uint8_t direction);
+void CarGoStraight(float angle);
 void Wheel_Init(void);
 
 #endif // !__WHEEL_H

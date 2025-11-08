@@ -2,6 +2,7 @@
 #include "tim.h"
 #include "pid.h"
 #include "math.h"
+#include "stdlib.h"
 
 uint64_t wheel_timestamp;
 uint64_t WHEEL_PULSE[4]   = {0, 0, 0, 0};
@@ -52,8 +53,11 @@ void UpdateWheelRPM(uint64_t ts)
 {
     uint64_t ms = ts - wheel_timestamp;
 
-    WHEEL_PULSE[3] = __HAL_TIM_GET_COUNTER(&htim4);
-    TIM4->CNT      = 0;
+    WHEEL_PULSE[0] = abs(__HAL_TIM_GET_COUNTER(&htim3) - 32767);
+    __HAL_TIM_SetCounter(&htim3, 32767);
+
+    WHEEL_PULSE[3] = abs(__HAL_TIM_GET_COUNTER(&htim4) - 32767);
+    __HAL_TIM_SetCounter(&htim4, 32767);
 
     for (int i = 0; i < 4; i++) {
         wheel_actual_rpm[i] = WHEEL_PULSE[i] * 60 * 1000 / 1320 / ms;
@@ -223,4 +227,18 @@ void CarMove(float Vx, float Vy, float Vz)
         SetWheelDirection(4, STOP);
     }
     SetWheelTargetRPM(4, fabsf(Vd) / (RADIUS * 2 * M_PI) * 60);
+}
+
+void CarSpin(uint8_t direction)
+{
+    if (direction == CLOCKWISE) {
+        CarMove(0, 0, -max_speed);
+    } else if (direction == COUNTERCLOCKWISE) {
+        CarMove(0, 0, max_speed);
+    }
+}
+
+void CarGoStraight(float angle)
+{
+    CarMove(max_speed * sinf(angle), -max_speed * cosf(angle), 0);
 }

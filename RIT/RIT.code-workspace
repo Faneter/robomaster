@@ -27,7 +27,9 @@
             "iterator": "c",
             "xutility": "c",
             "algorithm": "c",
-            "format": "c"
+            "format": "c",
+            "cmath": "c",
+            "cstdlib": "c"
         },
         "[yaml]": {
             "editor.insertSpaces": true,

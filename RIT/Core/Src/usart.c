@@ -179,6 +179,29 @@ void ServoControlDataInit(Servo_Control_Data *control, uint8_t *data)
     }
 }
 
+void CarGoStraightDataInit(Car_Go_Straight_Data *control, uint8_t *data)
+{
+    if (data[CAR_GO_STRAIGHT_SIZE + 1] == crc8_table_driven(data, CAR_GO_STRAIGHT_SIZE + 1)) {
+        float temp;
+        memcpy(&temp, data + 1, 4);
+        control->angle = temp;
+    }
+}
+
+void CarSpinDataInit(Car_Spin_Data *control, uint8_t *data)
+{
+    if (data[CAR_SPIN_SIZE + 1] == crc8_table_driven(data, CAR_SPIN_SIZE + 1)) {
+        control->direction = data[1];
+    }
+}
+
+void CarGearSelectDataInit(Car_Gear_Select_Data *control, uint8_t *data)
+{
+    if (data[CAR_GEAR_SELECT_SIZE + 1] == crc8_table_driven(data, CAR_GEAR_SELECT_SIZE + 1)) {
+        control->gear = data[1];
+    }
+}
+
 void CarStateDataInit(Car_State_Data *control, uint8_t *data)
 {
     // 帧头

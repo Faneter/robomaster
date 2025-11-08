@@ -36,12 +36,18 @@ extern UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN Private defines */
 
-#define WHEEL_CONTROL      0x11
-#define WHEEL_CONTROL_SIZE 12
-#define SERVO_CONTROL      0x12
-#define SERVO_CONTROL_SIZE 4
-#define CAR_STATE          0x13
-#define CAR_STATE_SIZE     16
+#define WHEEL_CONTROL        0x11
+#define WHEEL_CONTROL_SIZE   12
+#define SERVO_CONTROL        0x12
+#define SERVO_CONTROL_SIZE   4
+#define CAR_STATE            0x13
+#define CAR_STATE_SIZE       16
+#define CAR_GO_STRAIGHT      0x14
+#define CAR_GO_STRAIGHT_SIZE 4
+#define CAR_SPIN             0x15
+#define CAR_SPIN_SIZE        1
+#define CAR_GEAR_SELECT      0x16
+#define CAR_GEAR_SELECT_SIZE 1
 
 /* USER CODE END Private defines */
 
@@ -75,6 +81,33 @@ typedef struct {
     uint8_t servo3;
     uint8_t servo4;
 } Servo_Control_Data;
+
+/**
+ * @brief 车向某方向直线运动控制参数结构体
+ *
+ * @param angle 运动方向的角度
+ */
+typedef struct {
+    float angle;
+} Car_Go_Straight_Data;
+
+/**
+ * @brief 车向某方向旋转控制参数结构体
+ *
+ * @param angle 旋转的方向
+ */
+typedef struct {
+    uint8_t direction;
+} Car_Spin_Data;
+
+/**
+ * @brief 车运动速度挡位选择参数结构体
+ *
+ * @param gear 车运动挡位，范围为0-3
+ */
+typedef struct {
+    uint8_t gear;
+} Car_Gear_Select_Data;
 
 /**
  * @brief 车体状态结构体
@@ -115,6 +148,30 @@ void WheelControlDataInit(Wheel_Control_Data *control, uint8_t *data);
 void ServoControlDataInit(Servo_Control_Data *control, uint8_t *data);
 
 /**
+ * @brief 校验字节数组并从中解析出车向某方向直线运动控制参数结构体
+ *
+ * @param control 车向某方向直线运动控制参数结构体
+ * @param data 传入的字节数组，长度应等于`CAR_GO_STRAIGHT_SIZE + 2`
+ */
+void CarGoStraightDataInit(Car_Go_Straight_Data *control, uint8_t *data);
+
+/**
+ * @brief 校验字节数组并从中解析出车向某方向直线运动控制参数结构体
+ *
+ * @param control 车向某方向旋转控制参数结构体
+ * @param data 传入的字节数组，长度应等于`CAR_SPIN_SIZE + 2`
+ */
+void CarSpinDataInit(Car_Spin_Data *control, uint8_t *data);
+
+/**
+ * @brief 校验字节数组并从中解析出车运动速度挡位选择参数结构体
+ *
+ * @param control 车运动速度挡位选择参数结构体
+ * @param data 传入的字节数组，长度应等于`CAR_GEAR_SELECT_SIZE + 2`
+ */
+void CarGearSelectDataInit(Car_Gear_Select_Data *control, uint8_t *data);
+
+/**
  * @brief 将结构体中的数据存入字节数组中
  *
  * @param control 车体状态结构体
@@ -129,4 +186,3 @@ void CarStateDataInit(Car_State_Data *control, uint8_t *data);
 #endif
 
 #endif /* __USART_H__ */
-
