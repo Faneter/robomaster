@@ -182,8 +182,8 @@ void ServoControlDataInit(Servo_Control_Data *control, uint8_t *data)
 void CarGoStraightDataInit(Car_Go_Straight_Data *control, uint8_t *data)
 {
     if (data[CAR_GO_STRAIGHT_SIZE + 1] == crc8_table_driven(data, CAR_GO_STRAIGHT_SIZE + 1)) {
-        float temp;
-        memcpy(&temp, data + 1, 4);
+        int16_t temp;
+        memcpy(&temp, data + 1, 2);
         control->angle = temp;
     }
 }

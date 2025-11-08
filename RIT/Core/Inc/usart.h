@@ -43,7 +43,7 @@ extern UART_HandleTypeDef huart3;
 #define CAR_STATE            0x13
 #define CAR_STATE_SIZE       16
 #define CAR_GO_STRAIGHT      0x14
-#define CAR_GO_STRAIGHT_SIZE 4
+#define CAR_GO_STRAIGHT_SIZE 2
 #define CAR_SPIN             0x15
 #define CAR_SPIN_SIZE        1
 #define CAR_GEAR_SELECT      0x16
@@ -88,7 +88,7 @@ typedef struct {
  * @param angle 运动方向的角度
  */
 typedef struct {
-    float angle;
+    int16_t angle;
 } Car_Go_Straight_Data;
 
 /**

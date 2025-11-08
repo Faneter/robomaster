@@ -195,6 +195,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
                 CarSpinDataInit(&car_spin_data, UART_RxBuff);
                 CarSpin(car_spin_data.direction);
                 break;
+            case CAR_GEAR_SELECT:
+                // TODO
+                break;
             default:
                 break;
         }
