@@ -190,11 +190,9 @@ void SysTick_Handler(void)
     /* USER CODE BEGIN SysTick_IRQn 0 */
     static uint8_t count       = 0;
     static uint16_t count_uart = 0;
-    // 系统定时器中断处理代码，此定时器每1ms产生一次中断
-
-    timestamp++;
+    static Car_State_Data car_state_data;
     if (++count == 4) {
-        UpdateWheelRPM(timestamp);
+        UpdateWheelRPM();
 
         // 手柄按键事件处理
         uint16_t control = AX_PS2_ScanKey();
@@ -227,6 +225,32 @@ void SysTick_Handler(void)
         count = 0;
     }
     if (++count_uart == 1000) {
+        car_state_data.servo1 = servo_data.servo1;
+        car_state_data.servo2 = servo_data.servo2;
+        car_state_data.servo3 = servo_data.servo3;
+        car_state_data.servo4 = servo_data.servo4;
+        float Va              = GetWheelActualRPM(1) * M_PI * 2 * RADIUS / 60 *
+                           ((GetWheelDirection(1) == CLOCKWISE)
+                                    ? 1
+                                    : ((GetWheelDirection(1) == COUNTERCLOCKWISE) ? -1 : 0));
+        float Vb              = GetWheelActualRPM(2) * M_PI * 2 * RADIUS / 60 *
+                           ((GetWheelDirection(2) == CLOCKWISE)
+                                    ? 1
+                                    : ((GetWheelDirection(2) == COUNTERCLOCKWISE) ? -1 : 0));
+        float Vc              = GetWheelActualRPM(3) * M_PI * 2 * RADIUS / 60 *
+                           ((GetWheelDirection(3) == CLOCKWISE)
+                                    ? 1
+                                    : ((GetWheelDirection(3) == COUNTERCLOCKWISE) ? -1 : 0));
+        float Vd              = GetWheelActualRPM(4) * M_PI * 2 * RADIUS / 60 *
+                           ((GetWheelDirection(4) == CLOCKWISE)
+                                    ? 1
+                                    : ((GetWheelDirection(4) == COUNTERCLOCKWISE) ? -1 : 0));
+        car_state_data.Vx     = (Va + Vd) / 2;
+        car_state_data.Vy     = (Va - Vb) / 2;
+        car_state_data.Vz     = (Vc - Va) / 2 / T;
+        uint8_t data[CAR_STATE_SIZE + 2];
+        CarStateDataInit(&car_state_data, data);
+        HAL_UART_Transmit_DMA(&huart3, data, CAR_STATE_SIZE + 2);
         count_uart = 0;
     }
     /* USER CODE END SysTick_IRQn 0 */

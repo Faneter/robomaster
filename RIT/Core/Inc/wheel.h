@@ -61,8 +61,9 @@ extern float wheel_target_rpm[4];
 
 void SetWheelTargetRPM(uint8_t wheel, float rpm);
 float GetWheelActualRPM(uint8_t wheel);
-void UpdateWheelRPM(uint64_t ts);
+void UpdateWheelRPM();
 void SetWheelDirection(uint8_t wheel, uint8_t direction);
+uint8_t GetWheelDirection(uint8_t wheel);
 void CarMove(float Vx, float Vy, float Vz);
 void CarSpin(uint8_t direction);
 void CarGoStraight(float angle);

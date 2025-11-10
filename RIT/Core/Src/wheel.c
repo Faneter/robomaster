@@ -1,5 +1,4 @@
 #include "wheel.h"
-#include "tim.h"
 #include "pid.h"
 #include "math.h"
 #include "stdlib.h"
@@ -8,8 +7,9 @@ uint64_t wheel_timestamp;
 uint64_t WHEEL_PULSE[4]   = {0, 0, 0, 0};
 float wheel_target_rpm[4] = {0, 0, 0, 0};
 PID_PWM_TypeDef wheel_pid[4];
-float wheel_actual_rpm[4] = {0, 0, 0, 0};
-float max_speed           = 1.0f;
+float wheel_actual_rpm[4]         = {0, 0, 0, 0};
+uint8_t wheel_actual_direction[4] = {STOP, STOP, STOP, STOP};
+float max_speed                   = 1.0f;
 
 void Wheel_Init(void)
 {
@@ -36,7 +36,7 @@ void Wheel_Init(void)
     PID_Init(&wheel_pid[2], 0.2f, 0.05f, 0.005f, 90.0f, 0.0f);
     PID_Init(&wheel_pid[3], 0.2f, 0.05f, 0.005f, 90.0f, 0.0f);
 
-    wheel_timestamp = timestamp;
+    wheel_timestamp = HAL_GetTick();
 }
 
 float GetWheelActualRPM(uint8_t wheel)
@@ -51,7 +51,8 @@ void SetWheelTargetRPM(uint8_t wheel, float rpm)
 
 void UpdateWheelRPM(uint64_t ts)
 {
-    uint64_t ms = ts - wheel_timestamp;
+    uint64_t ms     = HAL_GetTick() - wheel_timestamp;
+    wheel_timestamp = HAL_GetTick();
 
     WHEEL_PULSE[0] = abs(__HAL_TIM_GET_COUNTER(&htim3) - 32767);
     __HAL_TIM_SetCounter(&htim3, 32767);
@@ -63,7 +64,6 @@ void UpdateWheelRPM(uint64_t ts)
         wheel_actual_rpm[i] = WHEEL_PULSE[i] * 60 * 1000 / 1320 / ms;
         WHEEL_PULSE[i]      = 0;
     }
-    wheel_timestamp = ts;
 
     float pwm1 = PID_Calculate(&wheel_pid[0], wheel_target_rpm[0], wheel_actual_rpm[0]);
     __HAL_TIM_SET_COMPARE(WHEEL_LF_PWM_TIM, WHEEL_LF_PWM_CHANNEL, (uint16_t)(100 * pwm1));
@@ -97,7 +97,7 @@ void SetWheelDirection(uint8_t wheel, uint8_t direction)
                     HAL_GPIO_WritePin(WHEEL_LF_IN2_GPIO, WHEEL_LF_IN2, SET);
                     break;
                 default:
-                    break;
+                    return;
             }
             break;
         case 2:
@@ -119,7 +119,7 @@ void SetWheelDirection(uint8_t wheel, uint8_t direction)
                     HAL_GPIO_WritePin(WHEEL_RF_IN2_GPIO, WHEEL_RF_IN2, SET);
                     break;
                 default:
-                    break;
+                    return;
             }
             break;
         case 3:
@@ -141,7 +141,7 @@ void SetWheelDirection(uint8_t wheel, uint8_t direction)
                     HAL_GPIO_WritePin(WHEEL_LB_IN2_GPIO, WHEEL_LB_IN2, SET);
                     break;
                 default:
-                    break;
+                    return;
             }
             break;
         case 4:
@@ -163,12 +163,18 @@ void SetWheelDirection(uint8_t wheel, uint8_t direction)
                     HAL_GPIO_WritePin(WHEEL_RB_IN2_GPIO, WHEEL_RB_IN2, SET);
                     break;
                 default:
-                    break;
+                    return;
             }
             break;
         default:
-            break;
+            return;
     }
+    wheel_actual_direction[wheel - 1] = direction;
+}
+
+uint8_t GetWheelDirection(uint8_t wheel)
+{
+    return wheel_actual_direction[wheel - 1];
 }
 
 /**

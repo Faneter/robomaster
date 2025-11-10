@@ -22,8 +22,6 @@
 
 /* USER CODE BEGIN 0 */
 
-uint64_t timestamp = 0;
-
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim1;

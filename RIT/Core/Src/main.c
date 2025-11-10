@@ -166,6 +166,9 @@ void SystemClock_Config(void)
 Wheel_Control_Data wheel_control_data;
 Car_Go_Straight_Data car_go_straight_data;
 Car_Spin_Data car_spin_data;
+Car_Gear_Select_Data car_gear_select_data;
+
+float car_gear[4] = {0.0f, 1.0f, 1.5f, 2.0f};
 
 /**
  * @brief  Reception Event Callback (Rx event notification called after use of advanced reception service).
@@ -196,7 +199,11 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
                 CarSpin(car_spin_data.direction);
                 break;
             case CAR_GEAR_SELECT:
-                // TODO
+                CarGearSelectDataInit(&car_gear_select_data, UART_RxBuff);
+                if (car_gear_select_data.gear > 3) {
+                    car_gear_select_data.gear = 3;
+                }
+                max_speed = car_gear[car_gear_select_data.gear];
                 break;
             default:
                 break;
