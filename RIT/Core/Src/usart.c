@@ -159,13 +159,12 @@ void WheelControlDataInit(Wheel_Control_Data *control, uint8_t *data)
     // 校验数据包CRC值
     if (data[WHEEL_CONTROL_SIZE + 1] == crc8_table_driven(data, WHEEL_CONTROL_SIZE + 1)) {
         // 读取数据
-        float temp;
-        memcpy(&temp, data + 1, 4);
-        control->Vx = temp;
-        memcpy(&temp, data + 5, 4);
-        control->Vy = temp;
-        memcpy(&temp, data + 9, 4);
-        control->Vz = temp;
+        EndianTransfer(data + 1, 4);
+        EndianTransfer(data + 5, 4);
+        EndianTransfer(data + 9, 4);
+        memcpy(&(control->Vx), data + 1, 4);
+        memcpy(&(control->Vy), data + 5, 4);
+        memcpy(&(control->Vz), data + 9, 4);
     }
 }
 
@@ -182,9 +181,8 @@ void ServoControlDataInit(Servo_Control_Data *control, uint8_t *data)
 void CarGoStraightDataInit(Car_Go_Straight_Data *control, uint8_t *data)
 {
     if (data[CAR_GO_STRAIGHT_SIZE + 1] == crc8_table_driven(data, CAR_GO_STRAIGHT_SIZE + 1)) {
-        int16_t temp;
-        memcpy(&temp, data + 1, 2);
-        control->angle = temp;
+        EndianTransfer(data + 1, 2);
+        memcpy(&(control->angle), data + 1, 2);
     }
 }
 
@@ -217,9 +215,23 @@ void CarStateDataInit(Car_State_Data *control, uint8_t *data)
     memcpy(data + 5, &(control->Vx), 4);
     memcpy(data + 9, &(control->Vy), 4);
     memcpy(data + 13, &(control->Vz), 4);
+    EndianTransfer(data + 1, 4);
+    EndianTransfer(data + 5, 4);
+    EndianTransfer(data + 9, 4);
 
     // CRC校验
     data[CAR_STATE_SIZE + 1] = crc8_table_driven(data, CAR_STATE_SIZE + 1);
+}
+
+uint8_t *EndianTransfer(uint8_t *bytes, size_t length)
+{
+    for (size_t i = 0; i < length / 2; i++) {
+        uint8_t temp          = 0;
+        temp                  = bytes[length - i - 1];
+        bytes[length - i - 1] = bytes[i];
+        bytes[i]              = temp;
+    }
+    return bytes;
 }
 
 /* USER CODE END 1 */

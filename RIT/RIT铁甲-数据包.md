@@ -164,4 +164,4 @@ uint8_t crc8_table_driven(const uint8_t *data, size_t length)
 
 其后只需调用`uint8_t crc8_table_driven(const uint8_t *data, size_t length)`函数，传入需要校验的数据和参与校验的位数即可得到校验值。
 
-## 其他事项
+# 

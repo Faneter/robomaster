@@ -179,6 +179,14 @@ void CarGearSelectDataInit(Car_Gear_Select_Data *control, uint8_t *data);
  */
 void CarStateDataInit(Car_State_Data *control, uint8_t *data);
 
+/**
+ * @brief 实现大小端数据转换
+ *
+ * @param bytes 要转换的字节数组
+ * @param length 要转换的长度
+ */
+uint8_t *EndianTransfer(uint8_t *bytes, size_t length);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
