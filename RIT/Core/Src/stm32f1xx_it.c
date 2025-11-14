@@ -37,7 +37,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -193,7 +192,6 @@ void SysTick_Handler(void)
     static Car_State_Data car_state_data;
     if (++count == 4) {
         UpdateWheelRPM();
-
         // 手柄按键事件处理
         uint16_t control = AX_PS2_ScanKey();
         uint8_t key      = control >> 8;
@@ -212,12 +210,12 @@ void SysTick_Handler(void)
             int8_t y = 0x7f - JoyStick.LJoy_UD;
             int8_t z = JoyStick.RJoy_LR - 0x80;
             if (x != 0 || y != 0) {
-                float angle = atan2f(x, y);
+                float angle = atan2f(y, x);
                 Vx          = max_speed * sinf(angle);
                 Vy          = -max_speed * cosf(angle);
             }
             if (z != 0) {
-                Vz = (z < 0) ? -max_speed : max_speed;
+                Vz = (z < 0) ? max_speed : -max_speed;
             }
             CarMove(Vx, Vy, Vz);
         }
@@ -229,25 +227,25 @@ void SysTick_Handler(void)
         car_state_data.servo2 = servo_data.servo2;
         car_state_data.servo3 = servo_data.servo3;
         car_state_data.servo4 = servo_data.servo4;
-        float Va              = GetWheelActualRPM(1) * M_PI * 2 * RADIUS / 60 *
-                           ((GetWheelDirection(1) == CLOCKWISE)
-                                    ? 1
-                                    : ((GetWheelDirection(1) == COUNTERCLOCKWISE) ? -1 : 0));
-        float Vb              = GetWheelActualRPM(2) * M_PI * 2 * RADIUS / 60 *
-                           ((GetWheelDirection(2) == CLOCKWISE)
-                                    ? 1
-                                    : ((GetWheelDirection(2) == COUNTERCLOCKWISE) ? -1 : 0));
-        float Vc              = GetWheelActualRPM(3) * M_PI * 2 * RADIUS / 60 *
-                           ((GetWheelDirection(3) == CLOCKWISE)
-                                    ? 1
-                                    : ((GetWheelDirection(3) == COUNTERCLOCKWISE) ? -1 : 0));
-        float Vd              = GetWheelActualRPM(4) * M_PI * 2 * RADIUS / 60 *
-                           ((GetWheelDirection(4) == CLOCKWISE)
-                                    ? 1
-                                    : ((GetWheelDirection(4) == COUNTERCLOCKWISE) ? -1 : 0));
-        car_state_data.Vx     = (Va + Vd) / 2;
-        car_state_data.Vy     = (Va - Vb) / 2;
-        car_state_data.Vz     = (Vc - Va) / 2 / T;
+        float Va              = GetWheelActualRPM(2) * M_PI * 2 * RADIUS / 60 *
+                   ((GetWheelDirection(2) == CLOCKWISE)
+                        ? -1
+                        : ((GetWheelDirection(2) == COUNTERCLOCKWISE) ? 1 : 0));
+        float Vb = GetWheelActualRPM(1) * M_PI * 2 * RADIUS / 60 *
+                   ((GetWheelDirection(1) == CLOCKWISE)
+                        ? -1
+                        : ((GetWheelDirection(1) == COUNTERCLOCKWISE) ? 1 : 0));
+        float Vc = GetWheelActualRPM(3) * M_PI * 2 * RADIUS / 60 *
+                   ((GetWheelDirection(3) == CLOCKWISE)
+                        ? -1
+                        : ((GetWheelDirection(3) == COUNTERCLOCKWISE) ? 1 : 0));
+        float Vd = GetWheelActualRPM(4) * M_PI * 2 * RADIUS / 60 *
+                   ((GetWheelDirection(4) == CLOCKWISE)
+                        ? -1
+                        : ((GetWheelDirection(4) == COUNTERCLOCKWISE) ? 1 : 0));
+        car_state_data.Vx = (Va + Vd) / 2;
+        car_state_data.Vy = (Va - Vb) / 2;
+        car_state_data.Vz = (Vc - Va) / 2 / T;
         uint8_t data[CAR_STATE_SIZE + 2];
         CarStateDataInit(&car_state_data, data);
         HAL_UART_Transmit_DMA(&huart3, data, CAR_STATE_SIZE + 2);

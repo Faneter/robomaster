@@ -9,7 +9,7 @@ float wheel_target_rpm[4] = {0, 0, 0, 0};
 PID_PWM_TypeDef wheel_pid[4];
 float wheel_actual_rpm[4]         = {0, 0, 0, 0};
 uint8_t wheel_actual_direction[4] = {STOP, STOP, STOP, STOP};
-float max_speed                   = 1.0f;
+float max_speed                   = 0.5f;
 
 void Wheel_Init(void)
 {
@@ -49,15 +49,15 @@ void SetWheelTargetRPM(uint8_t wheel, float rpm)
     wheel_target_rpm[wheel - 1] = rpm;
 }
 
-void UpdateWheelRPM(uint64_t ts)
+void UpdateWheelRPM()
 {
     uint64_t ms     = HAL_GetTick() - wheel_timestamp;
     wheel_timestamp = HAL_GetTick();
 
-    WHEEL_PULSE[0] = abs(__HAL_TIM_GET_COUNTER(&htim3) - 32767);
+    WHEEL_PULSE[WHEEL_LF - 1] = abs(__HAL_TIM_GET_COUNTER(&htim3) - 32767);
     __HAL_TIM_SetCounter(&htim3, 32767);
 
-    WHEEL_PULSE[3] = abs(__HAL_TIM_GET_COUNTER(&htim4) - 32767);
+    WHEEL_PULSE[WHEEL_RB - 1] = abs(__HAL_TIM_GET_COUNTER(&htim4) - 32767);
     __HAL_TIM_SetCounter(&htim4, 32767);
 
     for (int i = 0; i < 4; i++) {
@@ -65,20 +65,20 @@ void UpdateWheelRPM(uint64_t ts)
         WHEEL_PULSE[i]      = 0;
     }
 
-    float pwm1 = PID_Calculate(&wheel_pid[0], wheel_target_rpm[0], wheel_actual_rpm[0]);
+    float pwm1 = PID_Calculate(&wheel_pid[WHEEL_LF - 1], wheel_target_rpm[WHEEL_LF - 1], wheel_actual_rpm[WHEEL_LF - 1]);
     __HAL_TIM_SET_COMPARE(WHEEL_LF_PWM_TIM, WHEEL_LF_PWM_CHANNEL, (uint16_t)(100 * pwm1));
-    float pwm2 = PID_Calculate(&wheel_pid[1], wheel_target_rpm[1], wheel_actual_rpm[1]);
+    float pwm2 = PID_Calculate(&wheel_pid[WHEEL_RF - 1], wheel_target_rpm[WHEEL_RF - 1], wheel_actual_rpm[WHEEL_RF - 1]);
     __HAL_TIM_SET_COMPARE(WHEEL_RF_PWM_TIM, WHEEL_RF_PWM_CHANNEL, (uint16_t)(100 * pwm2));
-    float pwm3 = 100 * PID_Calculate(&wheel_pid[2], wheel_target_rpm[2], wheel_actual_rpm[2]);
+    float pwm3 = PID_Calculate(&wheel_pid[WHEEL_LB - 1], wheel_target_rpm[WHEEL_LB - 1], wheel_actual_rpm[WHEEL_LB - 1]);
     __HAL_TIM_SET_COMPARE(WHEEL_LB_PWM_TIM, WHEEL_LB_PWM_CHANNEL, (uint16_t)(100 * pwm3));
-    float pwm4 = PID_Calculate(&wheel_pid[3], wheel_target_rpm[3], wheel_actual_rpm[3]);
+    float pwm4 = PID_Calculate(&wheel_pid[WHEEL_RB - 1], wheel_target_rpm[WHEEL_RB - 1], wheel_actual_rpm[WHEEL_RB - 1]);
     __HAL_TIM_SET_COMPARE(WHEEL_RB_PWM_TIM, WHEEL_RB_PWM_CHANNEL, (uint16_t)(100 * pwm4));
 }
 
 void SetWheelDirection(uint8_t wheel, uint8_t direction)
 {
     switch (wheel) {
-        case 1:
+        case WHEEL_LF:
             switch (direction) {
                 case STOP:
                     HAL_GPIO_WritePin(WHEEL_LF_IN1_GPIO, WHEEL_LF_IN1, RESET);
@@ -100,19 +100,19 @@ void SetWheelDirection(uint8_t wheel, uint8_t direction)
                     return;
             }
             break;
-        case 2:
+        case WHEEL_RF:
             switch (direction) {
                 case STOP:
                     HAL_GPIO_WritePin(WHEEL_RF_IN1_GPIO, WHEEL_RF_IN1, RESET);
                     HAL_GPIO_WritePin(WHEEL_RF_IN2_GPIO, WHEEL_RF_IN2, RESET);
                     break;
                 case CLOCKWISE:
-                    HAL_GPIO_WritePin(WHEEL_RF_IN1_GPIO, WHEEL_RF_IN1, RESET);
-                    HAL_GPIO_WritePin(WHEEL_RF_IN2_GPIO, WHEEL_RF_IN2, SET);
-                    break;
-                case COUNTERCLOCKWISE:
                     HAL_GPIO_WritePin(WHEEL_RF_IN1_GPIO, WHEEL_RF_IN1, SET);
                     HAL_GPIO_WritePin(WHEEL_RF_IN2_GPIO, WHEEL_RF_IN2, RESET);
+                    break;
+                case COUNTERCLOCKWISE:
+                    HAL_GPIO_WritePin(WHEEL_RF_IN1_GPIO, WHEEL_RF_IN1, RESET);
+                    HAL_GPIO_WritePin(WHEEL_RF_IN2_GPIO, WHEEL_RF_IN2, SET);
                     break;
                 case PLUSE:
                     HAL_GPIO_WritePin(WHEEL_RF_IN1_GPIO, WHEEL_RF_IN1, SET);
@@ -122,7 +122,7 @@ void SetWheelDirection(uint8_t wheel, uint8_t direction)
                     return;
             }
             break;
-        case 3:
+        case WHEEL_LB:
             switch (direction) {
                 case STOP:
                     HAL_GPIO_WritePin(WHEEL_LB_IN1_GPIO, WHEEL_LB_IN1, RESET);
@@ -144,7 +144,7 @@ void SetWheelDirection(uint8_t wheel, uint8_t direction)
                     return;
             }
             break;
-        case 4:
+        case WHEEL_RB:
             switch (direction) {
                 case STOP:
                     HAL_GPIO_WritePin(WHEEL_RB_IN1_GPIO, WHEEL_RB_IN1, RESET);
@@ -199,40 +199,40 @@ void CarMove(float Vx, float Vy, float Vz)
     float Vd = Vx - Vy + Vz * T;
 
     if (Va < 0) {
-        SetWheelDirection(3, CLOCKWISE);
+        SetWheelDirection(WHEEL_LB, CLOCKWISE);
     } else if (Va > 0) {
-        SetWheelDirection(3, COUNTERCLOCKWISE);
+        SetWheelDirection(WHEEL_LB, COUNTERCLOCKWISE);
     } else {
-        SetWheelDirection(3, STOP);
+        SetWheelDirection(WHEEL_LB, STOP);
     }
-    SetWheelTargetRPM(3, fabsf(Va) * 60 / (RADIUS * 2 * M_PI));
+    SetWheelTargetRPM(WHEEL_LB, fabsf(Va) * 60 / (RADIUS * 2 * M_PI));
 
     if (Vb < 0) {
-        SetWheelDirection(1, CLOCKWISE);
+        SetWheelDirection(WHEEL_LF, CLOCKWISE);
     } else if (Vb > 0) {
-        SetWheelDirection(1, COUNTERCLOCKWISE);
+        SetWheelDirection(WHEEL_LF, COUNTERCLOCKWISE);
     } else {
-        SetWheelDirection(1, STOP);
+        SetWheelDirection(WHEEL_LF, STOP);
     }
-    SetWheelTargetRPM(1, fabsf(Vb) / (RADIUS * 2 * M_PI) * 60);
+    SetWheelTargetRPM(WHEEL_LF, fabsf(Vb) / (RADIUS * 2 * M_PI) * 60);
 
     if (Vc < 0) {
-        SetWheelDirection(2, CLOCKWISE);
+        SetWheelDirection(WHEEL_RF, CLOCKWISE);
     } else if (Vc > 0) {
-        SetWheelDirection(2, COUNTERCLOCKWISE);
+        SetWheelDirection(WHEEL_RF, COUNTERCLOCKWISE);
     } else {
-        SetWheelDirection(2, STOP);
+        SetWheelDirection(WHEEL_RF, STOP);
     }
-    SetWheelTargetRPM(2, fabsf(Vc) / (RADIUS * 2 * M_PI) * 60);
+    SetWheelTargetRPM(WHEEL_RF, fabsf(Vc) / (RADIUS * 2 * M_PI) * 60);
 
     if (Vd < 0) {
-        SetWheelDirection(4, CLOCKWISE);
+        SetWheelDirection(WHEEL_RB, CLOCKWISE);
     } else if (Vd > 0) {
-        SetWheelDirection(4, COUNTERCLOCKWISE);
+        SetWheelDirection(WHEEL_RB, COUNTERCLOCKWISE);
     } else {
-        SetWheelDirection(4, STOP);
+        SetWheelDirection(WHEEL_RB, STOP);
     }
-    SetWheelTargetRPM(4, fabsf(Vd) / (RADIUS * 2 * M_PI) * 60);
+    SetWheelTargetRPM(WHEEL_RB, fabsf(Vd) / (RADIUS * 2 * M_PI) * 60);
 }
 
 void CarSpin(uint8_t direction)

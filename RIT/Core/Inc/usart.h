@@ -194,3 +194,4 @@ uint8_t *EndianTransfer(uint8_t *bytes, size_t length);
 #endif
 
 #endif /* __USART_H__ */
+

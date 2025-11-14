@@ -203,18 +203,69 @@ void KeyEventHandler(uint8_t key, uint8_t state)
     static uint8_t last_key   = 0;
     static uint8_t last_state = 0;
     if (key != BUTTON_NO_CHANGE) {
+        if (state == BUTTON_STATE_RELEASED) {
+            static uint8_t gear      = 1;
+            static float car_gear[4] = {0.0f, 0.5f, 1.0f, 1.5f};
+
+            if (key == BUTTON_L1) {
+                gear      = (gear == 0) ? 0 : (gear - 1);
+                max_speed = car_gear[gear];
+            }
+            if (key == BUTTON_R1) {
+                gear      = (gear == 3) ? 3 : (gear + 1);
+                max_speed = car_gear[gear];
+            }
+            if (key == BUTTON_LS) {
+                CarMove(0.5, 0, 0);
+            }
+            if (key == BUTTON_RS) {
+                CarMove(-0.5, 0, 0);
+            }
+        }
         last_key   = key;
         last_state = state;
     } else if (key == BUTTON_NO_CHANGE) {
-        if (last_key == BUTTON_A && last_state == BUTTON_STATE_PRESSED) {
-            servo_data.servo1 += 1;
-            UpdateServoAngle();
-        }
-        if (last_key == BUTTON_B && last_state == BUTTON_STATE_PRESSED) {
-            if (servo_data.servo1 != 0) {
-                servo_data.servo1 -= 1;
+        if (last_state == BUTTON_STATE_RELEASED) {
+            if (last_key == BUTTON_A) {
+                servo_data.servo4 += 1;
+                SetServoAngle(4, servo_data.servo4);
             }
-            UpdateServoAngle();
+            if (last_key == BUTTON_B) {
+                if (servo_data.servo4 != 0) {
+                    servo_data.servo4 -= 1;
+                }
+                SetServoAngle(4, servo_data.servo4);
+            }
+            if (last_key == BUTTON_X) {
+                servo_data.servo2 += 1;
+                SetServoAngle(2, servo_data.servo2);
+            }
+            if (last_key == BUTTON_Y) {
+                if (servo_data.servo2 != 0) {
+                    servo_data.servo2 -= 1;
+                }
+                SetServoAngle(2, servo_data.servo2);
+            }
+            if (last_key == BUTTON_UP) {
+                servo_data.servo3 += 1;
+                SetServoAngle(3, servo_data.servo3);
+            }
+            if (last_key == BUTTON_DOWN) {
+                if (servo_data.servo3 != 0) {
+                    servo_data.servo3 -= 1;
+                }
+                SetServoAngle(3, servo_data.servo3);
+            }
+            if (last_key == BUTTON_L1) {
+                servo_data.servo1 += 1;
+                SetServoAngle(1, servo_data.servo1);
+            }
+            if (last_key == BUTTON_R1) {
+                if (servo_data.servo1 != 0) {
+                    servo_data.servo1 -= 1;
+                }
+                SetServoAngle(1, servo_data.servo1);
+            }
         }
     }
 }
