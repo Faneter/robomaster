@@ -215,12 +215,6 @@ void KeyEventHandler(uint8_t key, uint8_t state)
                 gear      = (gear == 3) ? 3 : (gear + 1);
                 max_speed = car_gear[gear];
             }
-            if (key == BUTTON_LS) {
-                CarMove(0.5, 0, 0);
-            }
-            if (key == BUTTON_RS) {
-                CarMove(-0.5, 0, 0);
-            }
         }
         last_key   = key;
         last_state = state;
@@ -256,11 +250,11 @@ void KeyEventHandler(uint8_t key, uint8_t state)
                 }
                 SetServoAngle(3, servo_data.servo3);
             }
-            if (last_key == BUTTON_L1) {
+            if (last_key == BUTTON_L2) {
                 servo_data.servo1 += 1;
                 SetServoAngle(1, servo_data.servo1);
             }
-            if (last_key == BUTTON_R1) {
+            if (last_key == BUTTON_R2) {
                 if (servo_data.servo1 != 0) {
                     servo_data.servo1 -= 1;
                 }

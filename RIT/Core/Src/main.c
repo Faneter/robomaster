@@ -95,18 +95,14 @@ int main(void)
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_TIM1_Init();
-    MX_TIM4_Init();
     MX_TIM2_Init();
     MX_TIM3_Init();
+    MX_TIM4_Init();
     MX_USART3_UART_Init();
     /* USER CODE BEGIN 2 */
     // CRC 配置
     crc8_init_table();
     // 车轮配置
-    HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
-    __HAL_TIM_SetCounter(&htim3, 32767);
-    HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
-    __HAL_TIM_SetCounter(&htim4, 32767);
     Wheel_Init();
     // 舵机配置
     Servo_Init();
@@ -167,7 +163,7 @@ Car_Go_Straight_Data car_go_straight_data;
 Car_Spin_Data car_spin_data;
 Car_Gear_Select_Data car_gear_select_data;
 
-float car_gear[4] = {0.0f, 1.0f, 1.5f, 2.0f};
+float car_gear[4] = {0.0f, 0.5f, 1.0f, 1.5f};
 
 /**
  * @brief  Reception Event Callback (Rx event notification called after use of advanced reception service).

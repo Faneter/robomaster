@@ -13,6 +13,12 @@ float max_speed                   = 0.5f;
 
 void Wheel_Init(void)
 {
+    // 编码器初始化
+    HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+    __HAL_TIM_SetCounter(&htim3, 32767);
+    HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
+    __HAL_TIM_SetCounter(&htim4, 32767);
+
     // PWM定时器启动
     HAL_TIM_PWM_Start(WHEEL_LF_PWM_TIM, WHEEL_LF_PWM_CHANNEL);
     HAL_TIM_PWM_Start(WHEEL_RF_PWM_TIM, WHEEL_RF_PWM_CHANNEL);
@@ -246,5 +252,5 @@ void CarSpin(uint8_t direction)
 
 void CarGoStraight(float angle)
 {
-    CarMove(max_speed * sinf(angle), -max_speed * cosf(angle), 0);
+    CarMove(max_speed * cosf(angle), max_speed * sinf(angle), 0);
 }

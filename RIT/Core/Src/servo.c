@@ -11,16 +11,16 @@ void Servo_Init(void)
     HAL_TIM_PWM_Start(SERVO_4_PWM_TIM, SERVO_4_PWM_CHANNEL);
 
     // 舵机初始化
-    // servo_data.servo1 = 90;
-    // HAL_Delay(1000);
-    // servo_data.servo2 = 90;
-    // HAL_Delay(1000);
-    // servo_data.servo3 = 90;
-    // HAL_Delay(1000);
-    // servo_data.servo4 = 90;
-    // HAL_Delay(1000);
+    servo_data.servo1 = 90;
+    HAL_Delay(1000);
+    servo_data.servo2 = 90;
+    HAL_Delay(1000);
+    servo_data.servo3 = 90;
+    HAL_Delay(1000);
+    servo_data.servo4 = 90;
+    HAL_Delay(1000);
 
-    // UpdateServoAngle();
+    UpdateServoAngle();
 }
 
 void SetServoAngle(uint8_t servo, uint8_t angle)
